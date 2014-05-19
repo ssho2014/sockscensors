@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style type="text/css">
+        .auto-style1
+        {
+            font-size: large;
+        }
+    </style>
+</head>
+<body style="font-family:Arial">
+
+    <p class="auto-style1">
+        <strong>How tunnel works?</strong></p>
+    <ol>
+        <li>Start this program and set the &quot;Local port&quot; number. We suggest use any numbers between 1025 and 65535. We will use 8888 here.</li>
+        <li>Set the &quot;Remote host&quot;. This is the host running a SOCKS4 proxy server.</li>
+        <li>Set the &quot;Remote port&quot;. This is the port number that the SOCKS4 proxy server is listening to.</li>
+        <li>Check &quot;SSL&quot; if the remote host supports SSL.</li>
+        <li>Configure the browser&#39;s SOCKS configuration. Set &quot;SOCKS host to 127.0.0.1&quot;; set the port to the port number in step #1, we&#39;ll use 8888</li>
+        <li>Configure the browser to use remote DNS. For FireFox, type &quot;about:config&quot; in address bar. Change the setting &quot;network.proxy.socks_remote_dns&quot; to &quot;true&quot; by double-clicking the value</li>
+    </ol>
+
+    <p class="auto-style1">
+        <strong>Setting up a simple SOCKS server with SSL (Ubuntu 14.04 LTS)</strong></p>
+    <ol>
+        <li>Use ssh to create a SOCKS4 proxy. Type the command:<br />
+            <div style="font-family:'Courier New'">ssh -f -N -D 0.0.0.0:8888 localhost<br />
+&nbsp;</div></li>
+        <li>If you want to use SSL. Do the following:<br />
+            <div style="font-family:'Courier New'">sudo apt-get update<br />
+                sudo apt-get upgrade<br />
+                sudo apt-get install stunnel4 -y<br />
+                cd /etc/stunnel/<br />
+                sudo cp /usr/share/doc/stunnel4/examples/stunnel.conf-sample ./stunnel.conf<br />
+&nbsp;<br />
+                </div>
+        </li>
+        <li>
+            Modify the stunnel.conf as follow:
+            <div style="font-family:'Courier New'">cert = /etc/stunnel/stunnel.pem<br />
+                client = no<br />
+                [socks4]<br />
+                accept = 8443<br />
+                connect = 127.0.0.1:8888<br />
+                cert = /etc/stunnel/stunnel.pem<br />
+&nbsp;</div>
+        </li>
+        <li>
+            Create SSL certificate:
+            <div style="font-family:'Courier New'">sudo bash<br />
+                openssl genrsa -out key.pem 2048<br />
+                openssl req -new -x509 -key key.pem -out cert.pem -days 1095<br />
+                cat key.pem cert.pem &gt; /etc/stunnel/stunnel.pem<br />
+&nbsp;</div>
+        </li>
+        <li>
+            Modify the file /etc/default/stunnel4:
+            <div style="font-family:'Courier New'">ENABLED=1<br />
+&nbsp;</div>
+        </li>
+        <li>
+            Restart stunnel4:
+            <div style="font-family:'Courier New'">/etc/init.d/stunnel4 restart</div>
+        </li>
+    </ol>
+
+</body>
+</html>
